@@ -1,7 +1,6 @@
 package org.example.prototype;
 
 public class Client {
-
     public static void fillRegistry(StudentRegistry studentRegistry) {
         Student june23BeginnerMonMorningStudent = new Student();
         june23BeginnerMonMorningStudent.setAvgBatchPsp(75.0);
