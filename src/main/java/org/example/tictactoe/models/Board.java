@@ -20,6 +20,19 @@ public class Board {
         }
     }
 
+    public void printBoard() {
+        for (List<Cell> cells : board) {
+            for (Cell cell : cells) {
+                if (cell.getCellState().equals(CellState.EMPTY)) {
+                    System.out.print("|  |");
+                } else {
+                    System.out.print("|" + cell.getPlayer().getSymbol().getaChar() + "|");
+                }
+            }
+            System.out.println();
+        }
+    }
+
     public int getSize() {
         return size;
     }

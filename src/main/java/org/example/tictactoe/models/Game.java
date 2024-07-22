@@ -3,9 +3,8 @@ package org.example.tictactoe.models;
 import org.example.tictactoe.exceptions.DuplicateSymbolFoundException;
 import org.example.tictactoe.exceptions.InvalidBotCountException;
 import org.example.tictactoe.exceptions.InvalidPlayerCountException;
-import org.example.tictactoe.strategies.WinningStrategy;
+import org.example.tictactoe.strategies.winningstrategy.WinningStrategy;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +107,68 @@ public class Game {
                     winningStrategies
             );
         }
+    }
+
+    private boolean validateMove(Move move) {
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+
+        if (row >= 0 && row < board.getSize() && col >= 0 && col < board.getSize()
+                && board.getBoard().get(row).get(col).getCellState().equals(CellState.EMPTY)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void makeMove() {
+        Player currentPlayer = players.get(nextPlayerMoveIndex);
+
+        System.out.println("This is " + currentPlayer.getName() + "'s turn");
+
+        Move move = currentPlayer.makeMove(board);
+
+        //Game should validate the move, whether the move is permissible or not.
+//        if (validateMove(move)) {
+//            return;
+//        }
+
+        //Move is valid, implement the move in the board.
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+
+        Cell cellToMark = board.getBoard().get(row).get(col);
+        cellToMark.setCellState(CellState.FILLED);
+        cellToMark.setPlayer(currentPlayer);
+
+        Move finalMoveObject = new Move(currentPlayer, cellToMark); // This finalMoveObject actually belongs to the Board.
+        moves.add(finalMoveObject);
+
+        nextPlayerMoveIndex += 1;
+        nextPlayerMoveIndex %= players.size();
+
+        //After every move, game will check if the current player has WON the game or not.
+        if (checkWinner(board, finalMoveObject)) {
+            gameState = GameState.ENDED;
+            winner = currentPlayer;
+        } else if (moves.size() == board.getSize() * board.getSize()) {
+            //Game has DRAWN
+            gameState = GameState.DRAW;
+        }
+    }
+
+    private boolean checkWinner(Board board, Move move) {
+        for (WinningStrategy winningStrategy : winningStrategies) {
+            if (winningStrategy.checkWinner(board, move)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void printBoard() {
+        board.printBoard();
     }
 
     public Board getBoard() {
